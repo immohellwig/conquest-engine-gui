@@ -58,7 +58,6 @@ public class ConquestGame implements Cloneable {
         // Unfortunately java.util.Random is not cloneable.  So a cloned game will have its
         // own random number generator, and actions applied to it may have different results
         // than in the original game.
-        
         return new ConquestGame(config, map.clone(), playerNames, round, turn, phase,
         		                new ArrayList<Region>(pickableRegions));
     }

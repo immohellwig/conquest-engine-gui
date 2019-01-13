@@ -242,17 +242,16 @@ public class GUI extends JFrame implements MouseListener, KeyListener
 	}
 	
 	private void waitForClick() {
-		long time = System.currentTimeMillis() + continualTime;
-		clicked = false;
-		
-		while(!clicked && !rightClick && !nextRound) { //wait for click, or skip if right button down
-			try {
-				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			if (continual && time < System.currentTimeMillis()) break; // skip if continual action and time out
-		}
+//		long time = System.currentTimeMillis() + continualTime;
+//		clicked = false;
+//		while(!clicked && !rightClick && !nextRound) { //wait for click, or skip if right button down
+//			try {
+//				Thread.sleep(50);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//			if (continual && time < System.currentTimeMillis()) break; // skip if continual action and time out
+//		}
 	}
 	
 	// ============

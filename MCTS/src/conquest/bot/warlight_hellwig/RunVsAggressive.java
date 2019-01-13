@@ -1,4 +1,4 @@
-package conquest.bot.custom;
+package conquest.bot.warlight_hellwig;
 
 import java.io.File;
 import java.util.*;
@@ -18,14 +18,14 @@ import conquest.game.world.Region;
 import conquest.utils.Util;
 import conquest.view.GUI;
 
-public class AggressiveBot extends GameBot 
+public class RunVsAggressive extends GameBot 
 {
 	FightAttackersResults aRes;
 	FightDefendersResults dRes;
 	
-	public AggressiveBot() {
-		aRes = FightAttackersResults.loadFromFile(Util.file("../Conquest-Bots/FightSimulation-Attackers-A200-D200.obj"));
-		dRes = FightDefendersResults.loadFromFile(Util.file("../Conquest-Bots/FightSimulation-Defenders-A200-D200.obj"));
+	public RunVsAggressive() {
+		aRes = FightAttackersResults.loadFromFile(Util.file("FightSimulation-Attackers-A200-D200.obj"));
+		dRes = FightDefendersResults.loadFromFile(Util.file("FightSimulation-Defenders-A200-D200.obj"));
 		System.err.println("---==[ AGGRESSIVE BOT INITIALIZED ]==---");
 	}
 	
@@ -228,7 +228,7 @@ public class AggressiveBot extends GameBot
 	public static void runInternal() {
 		Config config = new Config();
 		
-		config.bot1Init = "internal:conquest.bot.custom.AggressiveBot";
+		config.bot1Init = "internal:conquest.bot.warlight_hellwig.RunVsAggressive";
 		//config.bot1Init = "dir;process:../Conquest-Bots;java -cp ./bin;../Conquest/bin conquest.bot.external.JavaBot conquest.bot.custom.AggressiveBot ./AggressiveBot.log";
 		//config.bot2Init = "internal:conquest.bot.BotStarter";
 		config.bot2Init = "internal:conquest.bot.warlight_hellwig.MCTSBot";
@@ -251,7 +251,7 @@ public class AggressiveBot extends GameBot
 	}
 	
 	public static void runExternal() {
-		BotParser parser = new BotParser(new AggressiveBot());
+		BotParser parser = new BotParser(new RunVsAggressive());
 		parser.setLogFile(new File("./AggressiveBot.log"));
 		parser.run();
 	}

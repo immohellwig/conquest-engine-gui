@@ -10,4 +10,9 @@ public class MoveAction implements Action {
 	public void apply(GameState state) {
 		state.moveArmies(commands);
 	}
+	
+	@Override
+	public String toString() {
+		return commands.toString();
+	}
 }

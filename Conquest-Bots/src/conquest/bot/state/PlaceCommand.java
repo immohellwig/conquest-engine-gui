@@ -11,5 +11,11 @@ public class PlaceCommand {
 		this.region = region;
 		this.armies = armies;
 	}
+	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return region.name() + Integer.toString(armies);
+	}
 }
 

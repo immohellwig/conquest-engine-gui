@@ -10,4 +10,9 @@ public class PlaceAction implements Action {
 	public void apply(GameState state) {
 		state.placeArmies(commands);
 	}
+	
+	@Override
+	public String toString() {
+		return commands.toString();
+	}
 }
