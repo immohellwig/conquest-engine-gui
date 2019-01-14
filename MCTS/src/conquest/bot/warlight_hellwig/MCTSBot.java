@@ -63,7 +63,7 @@ public class MCTSBot extends GameBot {
 		if (mcts == null) {
 			WarlightGame game = new WarlightGame(state);
 			MCTSGenerator generator = new MCTSGenerator();
-			mcts = new Mcts<GameState, Action>(game,generator, new AggressiveBaseStrategy(), 1000, 5);
+			mcts = new Mcts<GameState, Action>(game,generator, new AggressiveBaseStrategy(), 1000, 3);
 		}
 		return ((PlaceAction) mcts.action(state)).commands;
 	}
