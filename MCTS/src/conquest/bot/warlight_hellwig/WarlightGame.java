@@ -44,20 +44,11 @@ public class WarlightGame implements Game<GameState, Action> {
 			List<MoveCommand> cmdList = ((MoveAction) action).commands;
 			alteredState.moveArmies(cmdList);
 			return alteredState;
-//			return getMostProbableOutcome(alteredState, cmdList);
 		} else {
 			alteredState.chooseRegion((ChooseCommand) action);
 			return alteredState;
 		}
 	}
-	
-//	private GameState getMostProbableOutcome(GameState alteredState, List<MoveCommand> cmdList) {
-//		for (MoveCommand currCommand : cmdList) {
-//			int attSurvivers = FightAttackersResults
-//			int defSurvivers;
-//		}
-//		return alteredState;
-//	}
 
 	/**
 	 * Not Used
@@ -74,7 +65,7 @@ public class WarlightGame implements Game<GameState, Action> {
 			toAdd.prob = 1;
 			toAdd.state = poss;
 			possibleResults.add(toAdd);
-		} else if (gameState.getPhase() == Phase.ATTACK_TRANSFER) { 
+		} else if (gameState.getPhase() == Phase.ATTACK_TRANSFER) {
 			MoveAction moveAction = (MoveAction) action;
 			Possibility<GameState> toAdd = new Possibility<>();
 			poss.moveArmies(moveAction.commands);

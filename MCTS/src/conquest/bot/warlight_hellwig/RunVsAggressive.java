@@ -26,7 +26,7 @@ public class RunVsAggressive extends GameBot
 	public RunVsAggressive() {
 		aRes = FightAttackersResults.loadFromFile(Util.file("FightSimulation-Attackers-A200-D200.obj"));
 		dRes = FightDefendersResults.loadFromFile(Util.file("FightSimulation-Defenders-A200-D200.obj"));
-		System.err.println("---==[ AGGRESSIVE BOT INITIALIZED ]==---");
+//		System.err.println("---==[ AGGRESSIVE BOT INITIALIZED ]==---");
 	}
 	
 	@Override

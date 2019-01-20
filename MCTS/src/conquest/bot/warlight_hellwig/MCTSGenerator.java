@@ -3,6 +3,7 @@ package conquest.bot.warlight_hellwig;
 import java.util.ArrayList;
 import java.util.List;
 
+import conquest.bot.fight.FightSimulation.FightAttackersResults;
 import conquest.bot.state.Action;
 import conquest.bot.state.ChooseCommand;
 import conquest.bot.state.GameState;
@@ -13,6 +14,7 @@ import conquest.bot.state.PlaceCommand;
 import conquest.bot.state.RegionState;
 import conquest.game.world.Continent;
 import conquest.game.world.Region;
+import conquest.utils.Util;
 import mcts.Generator;
 
 public class MCTSGenerator implements Generator<GameState, Action> {
@@ -43,7 +45,8 @@ public class MCTSGenerator implements Generator<GameState, Action> {
 		case ATTACK_TRANSFER:
 			List<List<MoveCommand>> attackList = new ArrayList<List<MoveCommand>>();
 			List<MoveCommand> transferList = new ArrayList<MoveCommand>();
-
+			FightAttackersResults res = FightAttackersResults
+					.loadFromFile(Util.file("FightSimulation-Attackers-A200-D200.obj"));
 			// Rotate over all owned regions with more than one armee
 
 			for (RegionState currentRegion : state.regions) {
@@ -57,7 +60,7 @@ public class MCTSGenerator implements Generator<GameState, Action> {
 					Region mayTransferTo = null;
 					for (RegionState neighborRegion : currentRegion.neighbours) {
 						if (!neighborRegion.owned(state.me)
-								&& currentRegion.armies > 1 + Math.round(neighborRegion.armies * 1.25)) { // CONSTANT
+								&& res.getAttackersWinChance(currentRegion.armies, neighborRegion.armies) > 0.75) {
 							// WINCHANCE
 							if (neighborRegion.owned(state.opp)) {
 								regionHasOppNeighbor = true;
@@ -79,7 +82,7 @@ public class MCTSGenerator implements Generator<GameState, Action> {
 						enemyNeighbors = 0; // TODO Refactor
 					}
 					if (enemyNeighbors > 1) {
-						if (regionHasOppNeighbor) { 
+						if (regionHasOppNeighbor) {
 							for (int j = 0; j < mayAttack.size(); j++) {
 								attackCommands.add(new MoveCommand(currentRegion.region, mayAttack.get(j),
 										Math.round((currentRegion.armies - 1) / 2)));
@@ -96,8 +99,6 @@ public class MCTSGenerator implements Generator<GameState, Action> {
 					} else if (enemyNeighbors == 0 && mayTransferTo != null) {
 						transferCommands
 								.add(new MoveCommand(currentRegion.region, mayTransferTo, currentRegion.armies - 1));
-					} else {
-						// TODO : RANDOM MOVE!
 					}
 					if (!attackCommands.isEmpty()) {
 						attackCommands.add(null);
@@ -107,8 +108,21 @@ public class MCTSGenerator implements Generator<GameState, Action> {
 					}
 				}
 			}
-			return combinations(attackList, transferList);
+			List<Action> finalList = combinations(attackList, transferList);
+			if (finalList.isEmpty()) { // No Options? Random Move!
+				for (RegionState currentRegion : state.regions) {
+					if (currentRegion.owned(state.me) && currentRegion.armies > 1) {
+						for (RegionState neighbor : currentRegion.neighbours) {
+							transferList.add(new MoveCommand(currentRegion, neighbor, currentRegion.armies - 1));
+							finalList.add(new MoveAction(transferList));
+						}
+					}
+					break;
+				}
+			}
+			return finalList;
 		default:
+			System.out.println("DefaultCase in Generator!");
 			return null;
 		}
 
