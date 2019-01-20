@@ -210,7 +210,7 @@ public class AggressiveBot extends GameBot
 			List<Region> path = bfs.getAllPaths(moveToFrontRegion).get(0);
 			Region moveTo = path.get(1);
 			
-			boolean first = true;
+			boolean first = false;
 			for (Region region : path) {
 				if (first) first = false;
 				else System.err.print(" --> ");

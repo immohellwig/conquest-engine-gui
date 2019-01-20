@@ -92,7 +92,7 @@ class Node<S, A> {
 		return bestRated;
 	}
 
-	A getRandomAction() {
+	A popRandomAction() {
 		Random rand = new Random();
 		int index = rand.nextInt(possilbleActions.size());
 		A selectedAction = possilbleActions.get(index);
@@ -113,10 +113,6 @@ class Node<S, A> {
 		return !possilbleActions.isEmpty();
 	}
 
-	boolean isRoot() {
-		return father == null;
-	}
-
 	A getAction() {
 		return lastAction;
 	}
@@ -130,7 +126,7 @@ class Node<S, A> {
 	}
 	
 	double getExploRating(double eC, double numeratorFather) {
-		return getRating() + eC * Math.sqrt((2 * Math.log(numeratorFather))/numerator);
+		return ((1 - numerator) / denominator) + eC * Math.sqrt((2 * Math.log(numeratorFather))/numerator);
 	}
 
 	S getState() {

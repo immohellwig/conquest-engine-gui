@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import conquest.bot.state.Action;
+import conquest.bot.state.ChooseCommand;
 import conquest.bot.state.GameState;
 import conquest.bot.state.MoveAction;
 import conquest.bot.state.MoveCommand;
 import conquest.bot.state.PlaceAction;
 import conquest.bot.state.PlaceCommand;
 import conquest.bot.state.RegionState;
+import conquest.game.world.Continent;
 import conquest.game.world.Region;
 import mcts.Generator;
 
@@ -20,7 +22,7 @@ public class MCTSGenerator implements Generator<GameState, Action> {
 		List<Action> moves = new ArrayList<Action>();
 		switch (state.getPhase()) {
 		case STARTING_REGIONS:
-			// return null;
+			return chooseRegion(state.getPickableRegions(), 1000);
 		case PLACE_ARMIES: // TODO: Split-Moves?
 			for (RegionState currentRegion : state.regions) {
 				if (currentRegion == null)
@@ -29,7 +31,8 @@ public class MCTSGenerator implements Generator<GameState, Action> {
 					for (RegionState neighborState : currentRegion.neighbours) {
 						if (!neighborState.owned(state.me)) {
 							List<PlaceCommand> cmdList = new ArrayList<PlaceCommand>();
-							cmdList.add(new PlaceCommand(currentRegion.region, state.players[state.me].placeArmies));
+							cmdList.add(new PlaceCommand(currentRegion.region,
+									state.players[state.me].placeArmies < 6 ? 5 : state.players[state.me].placeArmies));
 							moves.add(new PlaceAction(cmdList));
 							break;
 						}
@@ -38,42 +41,45 @@ public class MCTSGenerator implements Generator<GameState, Action> {
 			}
 			return moves;
 		case ATTACK_TRANSFER:
-			List<List<MoveCommand>> combinationList = new ArrayList<List<MoveCommand>>();
+			List<List<MoveCommand>> attackList = new ArrayList<List<MoveCommand>>();
+			List<MoveCommand> transferList = new ArrayList<MoveCommand>();
 
-			// Rotate over all owned regions with more than three armees
-			for (int i = 1; i < state.regions.length; i++) {
-				RegionState currentRegion = state.regions[i];
+			// Rotate over all owned regions with more than one armee
+
+			for (RegionState currentRegion : state.regions) {
+				if (currentRegion == null)
+					continue;
 				if (currentRegion.owned(state.me) && currentRegion.armies > 1) {
-
+					int enemyNeighbors = 0;
 					// Check if at border
-					boolean isOppNeighbor = false;
+					boolean regionHasOppNeighbor = false;
 					List<Region> mayAttack = new ArrayList<Region>();
-					List<Region> mayTransferTo = new ArrayList<Region>();
+					Region mayTransferTo = null;
 					for (RegionState neighborRegion : currentRegion.neighbours) {
 						if (!neighborRegion.owned(state.me)
-								&& currentRegion.armies > 1 + Math.round(neighborRegion.armies * 1.25)) { // CONSTANT WINCHANCE
+								&& currentRegion.armies > 1 + Math.round(neighborRegion.armies * 1.25)) { // CONSTANT
+							// WINCHANCE
 							if (neighborRegion.owned(state.opp)) {
-								isOppNeighbor = true;
+								regionHasOppNeighbor = true;
 							}
 							mayAttack.add(neighborRegion.region); // Add potential Attack-target
-						} else if (neighborRegion.owned(state.me)) {
-							for (RegionState neighborOfNeighbor : neighborRegion.neighbours) {
-								if (!neighborOfNeighbor.owned(state.me)) {
-									mayTransferTo.add(neighborRegion.region); // Add potential Troop movement within
-																				// territory
-									break;
-								}
-							}
+							enemyNeighbors++;
+						} else if (!neighborRegion.owned(state.me)) {
+							enemyNeighbors++;
 						}
 					}
+
+					if (mayAttack.isEmpty() && enemyNeighbors == 0) {
+						mayTransferTo = pathToBorder(state, currentRegion);
+					}
+
 					List<MoveCommand> attackCommands = new ArrayList<MoveCommand>();
 					List<MoveCommand> transferCommands = new ArrayList<MoveCommand>();
-					int enemyNeighbors = 0;
-					if (currentRegion.armies > 3) {
-						enemyNeighbors = mayAttack.size();
+					if (currentRegion.armies <= 3 || mayAttack.isEmpty()) {
+						enemyNeighbors = 0; // TODO Refactor
 					}
 					if (enemyNeighbors > 1) {
-						if (isOppNeighbor) {
+						if (regionHasOppNeighbor) { 
 							for (int j = 0; j < mayAttack.size(); j++) {
 								attackCommands.add(new MoveCommand(currentRegion.region, mayAttack.get(j),
 										Math.round((currentRegion.armies - 1) / 2)));
@@ -87,39 +93,70 @@ public class MCTSGenerator implements Generator<GameState, Action> {
 					} else if (enemyNeighbors == 1) {
 						attackCommands
 								.add(new MoveCommand(currentRegion.region, mayAttack.get(0), currentRegion.armies - 1));
-					} else if (enemyNeighbors == 0) {
-						if (!mayTransferTo.isEmpty()) {
-							for (Region currentOption : mayTransferTo) {
-								transferCommands.add(
-										new MoveCommand(currentRegion.region, currentOption, currentRegion.armies - 1));
-							}
-						} else { // TODO: Find shortest way to border
-							for (RegionState neighbor : currentRegion.neighbours) {
-								transferCommands.add(new MoveCommand(currentRegion.region, neighbor.region,
-										currentRegion.armies - 1));
-							}
-						}
-					}
-					if (attackCommands.isEmpty()) {
-						combinationList.add(transferCommands);
+					} else if (enemyNeighbors == 0 && mayTransferTo != null) {
+						transferCommands
+								.add(new MoveCommand(currentRegion.region, mayTransferTo, currentRegion.armies - 1));
 					} else {
+						// TODO : RANDOM MOVE!
+					}
+					if (!attackCommands.isEmpty()) {
 						attackCommands.add(null);
-						combinationList.add(attackCommands);
+						attackList.add(attackCommands);
+					} else {
+						transferList.addAll(transferCommands);
 					}
 				}
 			}
-			return combinations(combinationList);
+			return combinations(attackList, transferList);
 		default:
 			return null;
 		}
 
 	}
 
-	private List<Action> combinations(List<List<MoveCommand>> combinationList) {
+	private Region pathToBorder(GameState state, RegionState currentRegion) {
+		class Node {
+			RegionState state;
+			Node previous;
+
+			Node(RegionState state) {
+				this.state = state;
+			}
+		}
+		List<Node> checked = new ArrayList<Node>();
+		List<RegionState> unchecked = new ArrayList<RegionState>();
+		checked.add(new Node(currentRegion));
+		for (RegionState r : state.regions) {
+			if (r != currentRegion)
+				unchecked.add(r);
+		}
+		int i = 0;
+		while (i < checked.size()) {
+			for (RegionState current : checked.get(i).state.neighbours) {
+				if (unchecked.contains(current)) {
+					Node curr = new Node(current);
+					checked.add(curr);
+					unchecked.remove(current);
+					curr.previous = checked.get(i);
+					if (!curr.state.owned(state.me)) {
+						while (curr.previous.state != currentRegion) {
+							curr = curr.previous;
+						}
+						return curr.state.region;
+					}
+				}
+			}
+			i++;
+		}
+		return null;
+	}
+
+	private List<Action> combinations(List<List<MoveCommand>> attackList, List<MoveCommand> transferList) {
 		List<List<MoveCommand>> returnList = new ArrayList<List<MoveCommand>>();
-		recursiveCombinations(combinationList, returnList, new ArrayList<MoveCommand>(), combinationList.size());
+		recursiveCombinations(attackList, returnList, new ArrayList<MoveCommand>(), attackList.size());
 		List<Action> actionList = new ArrayList<Action>();
 		for (List<MoveCommand> currentCombination : returnList) {
+			currentCombination.addAll(transferList);
 			actionList.add(new MoveAction(currentCombination));
 		}
 		return actionList;
@@ -140,6 +177,43 @@ public class MCTSGenerator implements Generator<GameState, Action> {
 				currentCombination.add(currentElement);
 			recursiveCombinations(combinationList, returnList, currentCombination, depth - 1);
 			currentCombination.remove(currentElement);
+		}
+	}
+
+	private List<Action> chooseRegion(List<Region> choosable, long timeout) {
+		int min = Integer.MAX_VALUE;
+		List<Action> returnList = new ArrayList<Action>();
+
+		for (Region r : choosable) {
+			int p = getPreferredContinentPriority(r.continent);
+			if (p < min) {
+				returnList.clear();
+				min = p;
+				returnList.add(new ChooseCommand(r));
+			} else if (p == min) {
+				returnList.add(new ChooseCommand(r));
+			}
+		}
+
+		return returnList;
+	}
+
+	private int getPreferredContinentPriority(Continent continent) {
+		switch (continent) {
+		case Australia:
+			return 3;
+		case South_America:
+			return 1;
+		case North_America:
+			return 4;
+		case Europe:
+			return 5;
+		case Africa:
+			return 2;
+		case Asia:
+			return 6;
+		default:
+			return 7;
 		}
 	}
 }

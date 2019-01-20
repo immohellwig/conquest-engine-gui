@@ -13,6 +13,7 @@ import conquest.bot.state.MoveCommand;
 import conquest.bot.state.PlaceAction;
 import conquest.bot.state.PlaceCommand;
 import conquest.engine.Config;
+import conquest.engine.GameResult;
 import conquest.engine.RunGame;
 import conquest.game.FightMode;
 import conquest.game.world.Continent;
@@ -25,46 +26,16 @@ public class MCTSBot extends GameBot {
 
 	@Override
 	public ChooseCommand chooseRegion(List<Region> choosable, long timeout) {
-		int min = Integer.MAX_VALUE;
-		Region best = null;
-
-		for (Region r : choosable) {
-			int p = getPreferredContinentPriority(r.continent);
-			if (p < min) {
-				min = p;
-				best = r;
-			}
-		}
-
-		return new ChooseCommand(best);
-	}
-
-	public int getPreferredContinentPriority(Continent continent) {
-		switch (continent) {
-		case Australia:
-			return 1;
-		case South_America:
-			return 2;
-		case North_America:
-			return 3;
-		case Europe:
-			return 4;
-		case Africa:
-			return 5;
-		case Asia:
-			return 6;
-		default:
-			return 7;
-		}
-	}
-
-	@Override
-	public List<PlaceCommand> placeArmies(long timeout) {
 		if (mcts == null) {
 			WarlightGame game = new WarlightGame(state);
 			MCTSGenerator generator = new MCTSGenerator();
 			mcts = new Mcts<GameState, Action>(game,generator, new AggressiveBaseStrategy(), 1000, 3);
-		}
+		}		
+		return (ChooseCommand) mcts.action(state);
+	}
+
+	@Override
+	public List<PlaceCommand> placeArmies(long timeout) {
 		return ((PlaceAction) mcts.action(state)).commands;
 	}
 
@@ -73,7 +44,7 @@ public class MCTSBot extends GameBot {
 		return ((MoveAction) mcts.action(state)).commands;
 	}
 
-	public static void runInternal() {
+	public static GameResult runInternal(boolean visual) {
 		Config config = new Config();
 
 		config.bot1Init = "internal:conquest.bot.warlight_hellwig.MCTSBot";
@@ -87,14 +58,14 @@ public class MCTSBot extends GameBot {
 
 		config.game.fight = FightMode.CONTINUAL_1_1_A60_D70;
 
-		config.visualize = true;
+		config.visualize = visual;
 
 		config.replayLog = new File("./replay.log");
 
 		RunGame run = new RunGame(config);
-		run.go();
-
-		System.exit(0);
+		return run.go();
+		
+		
 	}
 
 	public static void runExternal() {
@@ -104,7 +75,7 @@ public class MCTSBot extends GameBot {
 	}
 
 	public static void main(String[] args) {
-		runInternal();
+		runInternal(true);
 
 		// JavaBot.exec(new String[]{"conquest.bot.custom.AggressiveBot",
 		// "./AggressiveBot.log"});

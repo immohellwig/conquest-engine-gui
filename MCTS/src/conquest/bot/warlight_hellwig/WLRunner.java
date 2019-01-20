@@ -1,12 +1,22 @@
 package conquest.bot.warlight_hellwig;
 
-import conquest.bot.state.GameState;
-import mcts.Runner;
+import java.util.Arrays;
+
+import conquest.engine.GameResult;
+
+//import conquest.bot.state.GameState;
 
 public class WLRunner {
+	static int[] wins = new int[3];
 	public static void main(String[] args) {
-		GameState state = new GameState();
-		WarlightGame game = new WarlightGame(state);
-		Runner.play(game, new MCTSBot(), new AggressiveBaseStrategy(), 100);
+		GameResult result;
+		for (int i = 1 ; i <= 25 ; i++) {
+			result = MCTSBot.runInternal(false);
+			wins[result.getWinner()]++;
+			System.err.println("--------------------");
+			System.err.println(Arrays.toString(wins));
+			System.err.println("--------------------");
+		}
+			
 	}
 }
