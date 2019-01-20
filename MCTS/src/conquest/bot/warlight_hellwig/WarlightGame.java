@@ -3,7 +3,9 @@ package conquest.bot.warlight_hellwig;
 import java.util.ArrayList;
 import java.util.List;
 
+import conquest.bot.fight.FightSimulation.FightAttackersResults;
 import conquest.bot.state.Action;
+import conquest.bot.state.ChooseCommand;
 import conquest.bot.state.GameState;
 import conquest.bot.state.MoveAction;
 import conquest.bot.state.MoveCommand;
@@ -33,7 +35,7 @@ public class WarlightGame implements Game<GameState, Action> {
 
 	@Override
 	public GameState apply(GameState state, Action action) {
-		GameState alteredState = state.clone();
+		GameState alteredState = state;
 		if (alteredState.getPhase() == Phase.PLACE_ARMIES) {
 			List<PlaceCommand> cmdList = ((PlaceAction) action).commands;
 			alteredState.placeArmies(cmdList);
@@ -42,11 +44,12 @@ public class WarlightGame implements Game<GameState, Action> {
 			List<MoveCommand> cmdList = ((MoveAction) action).commands;
 			alteredState.moveArmies(cmdList);
 			return alteredState;
+		} else {
+			alteredState.chooseRegion((ChooseCommand) action);
+			return alteredState;
 		}
-		System.err.println("randomResult called in wrong Phase!");
-		return null;
 	}
-	
+
 	/**
 	 * Not Used
 	 */
@@ -62,7 +65,7 @@ public class WarlightGame implements Game<GameState, Action> {
 			toAdd.prob = 1;
 			toAdd.state = poss;
 			possibleResults.add(toAdd);
-		} else if (gameState.getPhase() == Phase.ATTACK_TRANSFER) { 
+		} else if (gameState.getPhase() == Phase.ATTACK_TRANSFER) {
 			MoveAction moveAction = (MoveAction) action;
 			Possibility<GameState> toAdd = new Possibility<>();
 			poss.moveArmies(moveAction.commands);

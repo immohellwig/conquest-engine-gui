@@ -26,7 +26,7 @@ public class RunVsAggressive extends GameBot
 	public RunVsAggressive() {
 		aRes = FightAttackersResults.loadFromFile(Util.file("FightSimulation-Attackers-A200-D200.obj"));
 		dRes = FightDefendersResults.loadFromFile(Util.file("FightSimulation-Defenders-A200-D200.obj"));
-		System.err.println("---==[ AGGRESSIVE BOT INITIALIZED ]==---");
+//		System.err.println("---==[ AGGRESSIVE BOT INITIALIZED ]==---");
 	}
 	
 	@Override
@@ -210,13 +210,13 @@ public class RunVsAggressive extends GameBot
 			List<Region> path = bfs.getAllPaths(moveToFrontRegion).get(0);
 			Region moveTo = path.get(1);
 			
-			boolean first = true;
-			for (Region region : path) {
-				if (first) first = false;
-				else System.err.print(" --> ");
-				System.err.print(region);
-			}
-			System.err.println();
+//			boolean first = true;
+//			for (Region region : path) {
+//				if (first) first = false;
+//				else System.err.print(" --> ");
+//				System.err.print(region);
+//			}
+//			System.err.println();
 			
 			return transfer(from, state.region(moveTo));
 		}
@@ -225,7 +225,7 @@ public class RunVsAggressive extends GameBot
 	}
 	
 	
-	public static void runInternal() {
+	public static GameResult runInternal() {
 		Config config = new Config();
 		
 		config.bot1Init = "internal:conquest.bot.warlight_hellwig.RunVsAggressive";
@@ -246,8 +246,7 @@ public class RunVsAggressive extends GameBot
 		
 		RunGame run = new RunGame(config);
 		GameResult result = run.go();
-		
-		System.exit(0);
+		return result;
 	}
 	
 	public static void runExternal() {

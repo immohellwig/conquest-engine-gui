@@ -45,10 +45,11 @@ public class Mcts<S, A> implements Strategy<S, A> {
 
 	private double defaultPolicy(Node<S, A> expandedNode) {
 		S currentState = expandedNode.getState();
-		while (!game.isDone(currentState)) {
-			currentState = game.apply(currentState, base.action(currentState));
+		Game<S, A> currGame = game.clone();
+		while (!currGame.isDone(currentState)) {
+			currGame.apply(currentState, base.action(currentState));
 		}
-		return game.player(searchTree.getRoot().getState()) == game.outcome(currentState) ? 1 : 0;
+		return currGame.player(searchTree.getRoot().getState()) == game.outcome(currentState) ? 1 : 0;
 	}
 
 	public void setTimeLimit(int timeLimit) {

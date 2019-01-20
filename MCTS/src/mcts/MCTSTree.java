@@ -42,14 +42,14 @@ class MCTSTree<S, A> {
 		boolean playerColor;
 		while (currentNode != null) {
 			playerColor = game.player(currentNode.getState()) == game.player(root.getState());
-			currentNode.addRating(playerColor ? exploredRating : Math.abs(exploredRating - 1));
+			currentNode.addRating(playerColor ? exploredRating : 1 - exploredRating);
 			currentNode = currentNode.getFather();
 		}
 
 	}
 
 	private Node<S, A> expand(Node<S, A> currentNode) { // TODO: randomize?
-		A nextAction = currentNode.getRandomAction();
+		A nextAction = currentNode.popRandomAction();
 
 //		Stochastic Approach
 		S newState = game.clone().apply(currentNode.getState(), nextAction);
