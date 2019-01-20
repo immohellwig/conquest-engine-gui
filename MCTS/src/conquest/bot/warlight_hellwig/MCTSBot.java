@@ -78,7 +78,7 @@ public class MCTSBot extends GameBot {
 
 		config.bot1Init = "internal:conquest.bot.warlight_hellwig.MCTSBot";
 
-		config.bot2Init = "internal:conquest.bot.custom.AggressiveBot";
+		config.bot2Init = "internal:conquest.bot.warlight_hellwig.RunVsAggressive";
 		// config.bot2Init = "human";
 
 		config.botCommandTimeoutMillis = 20 * 1000;
