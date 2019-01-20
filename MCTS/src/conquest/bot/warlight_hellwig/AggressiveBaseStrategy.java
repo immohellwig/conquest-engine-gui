@@ -13,6 +13,7 @@ import conquest.bot.map.RegionBFS.BFSVisitResult;
 import conquest.bot.map.RegionBFS.BFSVisitResultType;
 import conquest.bot.map.RegionBFS.BFSVisitor;
 import conquest.bot.state.Action;
+import conquest.bot.state.ChooseCommand;
 import conquest.bot.state.GameState;
 import conquest.bot.state.MoveAction;
 import conquest.bot.state.MoveCommand;
@@ -21,6 +22,7 @@ import conquest.bot.state.PlaceCommand;
 import conquest.bot.state.PlayerState;
 import conquest.bot.state.RegionState;
 import conquest.game.Phase;
+import conquest.game.world.Continent;
 import conquest.game.world.Region;
 import conquest.utils.Util;
 import mcts.Strategy;
@@ -111,8 +113,43 @@ public class AggressiveBaseStrategy implements Strategy<GameState, Action> {
 			}
 			MoveAction resultAction = new MoveAction(result);
 			return resultAction;
+		} else {
+			return chooseRegion(state.getPickableRegions(), 1000);
 		}
-		return null;
+	}
+	
+	public ChooseCommand chooseRegion(List<Region> choosable, long timeout) {
+		int min = Integer.MAX_VALUE;
+		Region best = null;
+
+		for (Region r : choosable) {
+			int p = getPreferredContinentPriority(r.continent);
+			if (p < min) {
+				min = p;
+				best = r;
+			}
+		}
+
+		return new ChooseCommand(best);
+	}
+
+	public int getPreferredContinentPriority(Continent continent) {
+		switch (continent) {
+		case Australia:
+			return 1;
+		case South_America:
+			return 2;
+		case North_America:
+			return 3;
+		case Europe:
+			return 4;
+		case Africa:
+			return 5;
+		case Asia:
+			return 6;
+		default:
+			return 7;
+		}
 	}
 	
 	private int getRegionScore(RegionState o1, GameState state) {
@@ -176,13 +213,13 @@ public class AggressiveBaseStrategy implements Strategy<GameState, Action> {
 			List<Region> path = bfs.getAllPaths(moveToFrontRegion).get(0);
 			Region moveTo = path.get(1);
 			
-			boolean first = true;
-			for (Region region : path) {
-				if (first) first = false;
-				else System.err.print(" --> ");
-				System.err.print(region);
-			}
-			System.err.println();
+//			boolean first = true;
+//			for (Region region : path) {
+//				if (first) first = false;
+//				else System.err.print(" --> ");
+//				System.err.print(region);
+//			}
+//			System.err.println();
 			
 			return transfer(from, state.region(moveTo), state);
 		}
