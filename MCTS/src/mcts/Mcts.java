@@ -35,7 +35,8 @@ public class Mcts<S, A> implements Strategy<S, A> {
 			counter++;
 		}
 		try {
-			A result = searchTree.getRoot().getBestRatedChild(0).getAction();
+			boolean samePlayer = game.player(state) == game.player(searchTree.getRoot().getRandomChildState());
+			A result = searchTree.getRoot().getBestRatedChild(0,samePlayer).getAction();
 			return result;
 		} catch (Exception e) {
 			System.err.println("Expanded: " + counter);

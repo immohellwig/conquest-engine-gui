@@ -48,7 +48,7 @@ class MCTSNode<S, A> {
 	 */
 
 	private double denominator = 0;
-	
+
 	/**
 	 * Root constructor, initializes rating with 0
 	 */
@@ -71,7 +71,17 @@ class MCTSNode<S, A> {
 		children.add(node);
 	}
 
-	MCTSNode<S, A> getBestRatedChild(double exlorationConstant) { // TODO Implement ExplorationConstant
+	S getRandomChildState() {
+		if (children.isEmpty()) {
+			System.err.println("Node has no Children!");
+			return null;
+		} else {
+			return children.get(0).state;
+		}
+	}
+
+	MCTSNode<S, A> getBestRatedChild(double exlorationConstant, boolean samePlayer) { // TODO Implement
+																						// ExplorationConstant
 		Iterator<MCTSNode<S, A>> iter = children.iterator();
 		MCTSNode<S, A> bestRated;
 		if (iter.hasNext()) {
@@ -83,8 +93,16 @@ class MCTSNode<S, A> {
 		MCTSNode<S, A> current;
 		while (iter.hasNext()) {
 			current = iter.next();
-			if (bestRated.getExploRating(exlorationConstant, numerator) < current.getExploRating(exlorationConstant, numerator)) {
-				bestRated = current;
+			if (samePlayer) {
+				if (bestRated.getExploRating(exlorationConstant, denominator) > current
+						.getExploRating(exlorationConstant, denominator)) {
+					bestRated = current;
+				}
+			} else {
+				if (bestRated.getExploRating(exlorationConstant, denominator) < current
+						.getExploRating(exlorationConstant, denominator)) {
+					bestRated = current;
+				}
 			}
 		}
 		return bestRated;
@@ -122,20 +140,17 @@ class MCTSNode<S, A> {
 	double getRating() {
 		return numerator / denominator;
 	}
-	
-	double getExploRating(double eC, double numeratorFather) {
-		if (numerator != 0)
-			return ((1 - numerator) / denominator) + eC * Math.sqrt((2 * Math.log(numeratorFather))/numerator);
-		else
-			return ((1 - numerator) / denominator);
+
+	double getExploRating(double eC, double denominatorFather) {
+		return ((1 - numerator) / denominator) + eC * Math.sqrt((2 * Math.log(denominatorFather)) / denominator);
 	}
 
 	S getState() {
 		return state;
 	}
-	
+
 	@Override
 	public String toString() {
-		return Double.toString(getExploRating(0,0));
+		return Double.toString(getExploRating(0, 0));
 	}
 }
