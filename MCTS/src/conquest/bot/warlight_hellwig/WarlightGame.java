@@ -34,45 +34,33 @@ public class WarlightGame implements Game<GameState, Action> {
 	}
 
 	@Override
-	public GameState apply(GameState state, Action action) {
-		GameState alteredState = state;
-		if (alteredState.getPhase() == Phase.PLACE_ARMIES) {
+	public void apply(GameState state, Action action) {
+		if (state.getPhase() == Phase.PLACE_ARMIES) {
 			List<PlaceCommand> cmdList = ((PlaceAction) action).commands;
-			alteredState.placeArmies(cmdList);
-			return alteredState;
-		} else if (alteredState.getPhase() == Phase.ATTACK_TRANSFER) {
+			state.placeArmies(cmdList);
+		} else if (state.getPhase() == Phase.ATTACK_TRANSFER) {
 			List<MoveCommand> cmdList = ((MoveAction) action).commands;
-			alteredState.moveArmies(cmdList);
-			return alteredState;
+			state.moveArmies(cmdList);
 		} else {
-			alteredState.chooseRegion((ChooseCommand) action);
-			return alteredState;
+			state.chooseRegion((ChooseCommand) action);
 		}
 	}
-
-	/**
-	 * Not Used
-	 */
 
 	@Override
 	public List<Possibility<GameState>> possibleResults(GameState state, Action action) {
 		List<Possibility<GameState>> possibleResults = new ArrayList<Possibility<GameState>>();
 		GameState poss = state.clone();
-		if (gameState.getPhase() == Phase.PLACE_ARMIES) {
+		if (poss.getPhase() == Phase.PLACE_ARMIES) {
 			PlaceAction placeAction = (PlaceAction) action;
-			Possibility<GameState> toAdd = new Possibility<GameState>();
 			poss.placeArmies(placeAction.commands);
-			toAdd.prob = 1;
-			toAdd.state = poss;
-			possibleResults.add(toAdd);
-		} else if (gameState.getPhase() == Phase.ATTACK_TRANSFER) {
+		} else if (poss.getPhase() == Phase.ATTACK_TRANSFER) {
 			MoveAction moveAction = (MoveAction) action;
-			Possibility<GameState> toAdd = new Possibility<>();
 			poss.moveArmies(moveAction.commands);
-			toAdd.prob = 1;
-			toAdd.state = poss;
-			possibleResults.add(toAdd);
+		} else {
+			ChooseCommand chooseAction = (ChooseCommand) action;
+			poss.chooseRegion(chooseAction);
 		}
+		possibleResults.add(new Possibility<>(1,poss));
 		return possibleResults;
 	}
 

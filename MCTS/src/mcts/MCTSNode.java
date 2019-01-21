@@ -5,13 +5,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-class Node<S, A> {
+class MCTSNode<S, A> {
 
 	/**
 	 * Father: Representing former state
 	 */
 
-	final private Node<S, A> father;
+	final private MCTSNode<S, A> father;
 
 	/**
 	 * State of the Node
@@ -23,7 +23,7 @@ class Node<S, A> {
 	 * Children: Representing explored/expanded possibilities
 	 */
 
-	final List<Node<S, A>> children;
+	final private List<MCTSNode<S, A>> children;
 
 	/**
 	 * Unexplored actions
@@ -41,48 +41,46 @@ class Node<S, A> {
 	 * Numerator of Rating
 	 */
 
-	private double numerator;
+	private double numerator = 0;
 
 	/**
 	 * Denominator of Rating
 	 */
 
-	private double denominator;
+	private double denominator = 0;
 	
 	/**
 	 * Root constructor, initializes rating with 0
 	 */
 
-	Node(S state, List<A> possibleActions) {
+	MCTSNode(S state, List<A> possibleActions) {
 		this(null, state, possibleActions, null);
 	}
 
-	Node(A lastAction, S state, List<A> possibleActions, Node<S, A> father) {
-		numerator = 0;
-		denominator = 0;
+	MCTSNode(A lastAction, S state, List<A> possibleActions, MCTSNode<S, A> father) {
 		this.state = state;
 		this.possilbleActions = possibleActions;
 		this.father = father;
-		this.children = new ArrayList<Node<S, A>>();
+		this.children = new ArrayList<MCTSNode<S, A>>();
 		this.lastAction = lastAction;
 		if (father != null)
 			this.father.addChild(this);
 	}
 
-	void addChild(Node<S, A> node) {
+	void addChild(MCTSNode<S, A> node) {
 		children.add(node);
 	}
 
-	Node<S, A> getBestRatedChild(double exlorationConstant) { // TODO Implement ExplorationConstant
-		Iterator<Node<S, A>> iter = children.iterator();
-		Node<S, A> bestRated;
+	MCTSNode<S, A> getBestRatedChild(double exlorationConstant) { // TODO Implement ExplorationConstant
+		Iterator<MCTSNode<S, A>> iter = children.iterator();
+		MCTSNode<S, A> bestRated;
 		if (iter.hasNext()) {
 			bestRated = iter.next();
 		} else {
 			System.err.println("Root has no Children!");
 			return null;
 		}
-		Node<S, A> current;
+		MCTSNode<S, A> current;
 		while (iter.hasNext()) {
 			current = iter.next();
 			if (bestRated.getExploRating(exlorationConstant, numerator) < current.getExploRating(exlorationConstant, numerator)) {
@@ -117,7 +115,7 @@ class Node<S, A> {
 		return lastAction;
 	}
 
-	Node<S, A> getFather() {
+	MCTSNode<S, A> getFather() {
 		return father;
 	}
 
@@ -126,7 +124,10 @@ class Node<S, A> {
 	}
 	
 	double getExploRating(double eC, double numeratorFather) {
-		return ((1 - numerator) / denominator) + eC * Math.sqrt((2 * Math.log(numeratorFather))/numerator);
+		if (numerator != 0)
+			return ((1 - numerator) / denominator) + eC * Math.sqrt((2 * Math.log(numeratorFather))/numerator);
+		else
+			return ((1 - numerator) / denominator);
 	}
 
 	S getState() {
@@ -135,6 +136,6 @@ class Node<S, A> {
 	
 	@Override
 	public String toString() {
-		return Double.toString(getRating()) + lastAction;
+		return Double.toString(getExploRating(0,0));
 	}
 }
