@@ -7,7 +7,8 @@ public class Runner {
 		int[] wins = new int[3];
 		
 		for (int i = 1 ; i <= count ; ++i) {
-			
+			if (i == 20)
+				System.out.println("Hilfe!");
 			S s = game.initialState();
 			while (!game.isDone(s)) {
 				System.out.println("Player " + game.player(s) + " moves...");

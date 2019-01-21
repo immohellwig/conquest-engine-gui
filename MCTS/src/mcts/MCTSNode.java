@@ -49,20 +49,23 @@ class MCTSNode<S, A> {
 
 	private double denominator = 0;
 
+	private final int player;
+
 	/**
 	 * Root constructor, initializes rating with 0
 	 */
 
-	MCTSNode(S state, List<A> possibleActions) {
-		this(null, state, possibleActions, null);
+	MCTSNode(S state, List<A> possibleActions, int player) {
+		this(null, state, possibleActions, null, player);
 	}
 
-	MCTSNode(A lastAction, S state, List<A> possibleActions, MCTSNode<S, A> father) {
+	MCTSNode(A lastAction, S state, List<A> possibleActions, MCTSNode<S, A> father, int player) {
 		this.state = state;
 		this.possilbleActions = possibleActions;
 		this.father = father;
 		this.children = new ArrayList<MCTSNode<S, A>>();
 		this.lastAction = lastAction;
+		this.player = player;
 		if (father != null)
 			this.father.addChild(this);
 	}
@@ -71,17 +74,8 @@ class MCTSNode<S, A> {
 		children.add(node);
 	}
 
-	S getRandomChildState() {
-		if (children.isEmpty()) {
-			System.err.println("Node has no Children!");
-			return null;
-		} else {
-			return children.get(0).state;
-		}
-	}
-
-	MCTSNode<S, A> getBestRatedChild(double exlorationConstant) { // TODO Implement
-																	// ExplorationConstant
+	MCTSNode<S, A> getBestRatedChild(double exlorationConstant, int me) { // TODO Implement
+		// ExplorationConstant
 		Iterator<MCTSNode<S, A>> iter = children.iterator();
 		MCTSNode<S, A> bestRated;
 		if (iter.hasNext()) {
@@ -91,11 +85,21 @@ class MCTSNode<S, A> {
 			return null;
 		}
 		MCTSNode<S, A> current;
+		double bestRating = bestRated.getExploRating(exlorationConstant, denominator);
+		double currentRating;
 		while (iter.hasNext()) {
 			current = iter.next();
-			if (bestRated.getExploRating(exlorationConstant, denominator) < current.getExploRating(exlorationConstant,
-					denominator)) {
-				bestRated = current;
+			currentRating = current.getExploRating(exlorationConstant, denominator);
+			if (bestRated.getPlayer() != me) {
+				if (bestRating < currentRating) {
+					bestRated = current;
+					bestRating = bestRated.getExploRating(exlorationConstant, denominator);
+				}
+			} else {
+				if (bestRating > currentRating) {
+					bestRated = current;
+					bestRating = bestRated.getExploRating(exlorationConstant, denominator);
+				}
 			}
 		}
 		return bestRated;
@@ -145,5 +149,9 @@ class MCTSNode<S, A> {
 
 	double getDenominator() {
 		return denominator;
+	}
+
+	public int getPlayer() {
+		return player;
 	}
 }

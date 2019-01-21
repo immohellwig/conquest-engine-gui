@@ -20,7 +20,7 @@ class MCTSTree<S, A> {
 	public void updateRoot(final S state) {
 		S init = state;
 		List<A> moveCandidates = generator.actions(init);
-		root = new MCTSNode<S, A>(init, moveCandidates);
+		root = new MCTSNode<S, A>(init, moveCandidates, game.player(state));
 	}
 
 	public MCTSNode<S, A> treePolicy() {
@@ -30,25 +30,23 @@ class MCTSTree<S, A> {
 			if (currentNode.isNotFullyExpanded()) {
 				return expand(currentNode);
 			} else {
-				currentNode = currentNode.getBestRatedChild(expConst);
+				currentNode = currentNode.getBestRatedChild(expConst, game.player(root.getState()));
 			}
 		}
-		return currentNode;
+		return currentNode != root ? currentNode : null;
 	}
 	
 	private MCTSNode<S, A> expand(final MCTSNode<S, A> currentNode) { // TODO: randomize?
 		A nextAction = currentNode.popRandomAction();
 		S newState = game.possibleResults(currentNode.getState(), nextAction).get(0).state;
-		MCTSNode<S, A> expanded = new MCTSNode<S, A>(nextAction, newState, generator.actions(newState), currentNode);
+		MCTSNode<S, A> expanded = new MCTSNode<S, A>(nextAction, newState, generator.actions(newState), currentNode, game.player(newState));
 		return expanded;
 	}
 
 	public void propagateBack(final MCTSNode<S, A> expanded, double exploredRating) {
 		MCTSNode<S, A> currentNode = expanded;
-		boolean playerColor;
 		while (currentNode != null) {
-			playerColor = game.player(currentNode.getState()) == game.player(root.getState());
-			currentNode.addRating(playerColor ? exploredRating : 1 - exploredRating);
+			currentNode.addRating(exploredRating);
 			currentNode = currentNode.getFather();
 		}
 

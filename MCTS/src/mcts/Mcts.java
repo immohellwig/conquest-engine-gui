@@ -27,12 +27,14 @@ public class Mcts<S, A> implements Strategy<S, A> {
 		long endingTime = time + timeLimit * 1000;
 		while (System.currentTimeMillis() < endingTime) {
 			expanded = searchTree.treePolicy();
+			if (expanded == null)
+				break;
 			exploredRating = defaultPolicy(expanded);
 			searchTree.propagateBack(expanded, exploredRating);
 			counter++;
 		}
 		try {
-			A result = searchTree.getRoot().getBestRatedChild(0).getAction();
+			A result = searchTree.getRoot().getBestRatedChild(0,game.player(state)).getAction();
 			return result;
 		} catch (Exception e) {
 			System.err.println("Expanded: " + counter);
@@ -47,13 +49,22 @@ public class Mcts<S, A> implements Strategy<S, A> {
 			while (!game.isDone(currentState)) {
 				game.apply(currentState, base.action(currentState));
 			}
-			return game.player(searchTree.getRoot().getState()) == game.outcome(currentState) ? 1 : 0;
+			return getRating(currentState);
 		} else {
-			return game.player(searchTree.getRoot().getState()) == game.outcome(expandedNode.getState()) ? 1 : 0;
+			return getRating(expandedNode.getState());
 		}
 	}
-
-	public void setTimeLimit(int timeLimit) {
-		this.timeLimit = timeLimit;
+	
+	private double getRating(S currentState) {
+		double result = game.outcome(currentState);
+		int me = game.player(searchTree.getRoot().getState());
+		if (result == 0.0)
+			return 2 == me ? 1 : 0;
+		else if (result == 0.5)
+			return 0.5; // draw
+		else if (result == 1.0)
+			return 1 == me ? 1 : 0;
+		System.err.println("Invalid outcome");
+		return -1;
 	}
 }

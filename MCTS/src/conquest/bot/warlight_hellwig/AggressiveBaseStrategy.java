@@ -5,13 +5,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
 import conquest.bot.fight.FightSimulation.FightAttackersResults;
 import conquest.bot.fight.FightSimulation.FightDefendersResults;
-import conquest.bot.map.RegionBFS;
-import conquest.bot.map.RegionBFS.BFSNode;
-import conquest.bot.map.RegionBFS.BFSVisitResult;
-import conquest.bot.map.RegionBFS.BFSVisitResultType;
-import conquest.bot.map.RegionBFS.BFSVisitor;
 import conquest.bot.state.Action;
 import conquest.bot.state.ChooseCommand;
 import conquest.bot.state.GameState;
@@ -39,9 +35,6 @@ public class AggressiveBaseStrategy implements Strategy<GameState, Action> {
 
 	@Override
 	public Action action(GameState state) {
-//		List<Action> list = generator.actions(state);
-//		int select = rand.nextInt(list.size());
-//		return list.get(select);
 		if (state.getPhase() == Phase.PLACE_ARMIES) {
 			
 			PlayerState me = state.players[state.me];
@@ -189,41 +182,41 @@ public class AggressiveBaseStrategy implements Strategy<GameState, Action> {
 		return result;
 	}
 	
-	private Region moveToFrontRegion;
-	
-	private MoveCommand moveToFront(RegionState from, GameState state) {
-		RegionBFS<BFSNode> bfs = new RegionBFS<BFSNode>();
-		moveToFrontRegion = null;
-		bfs.run(from.region, new BFSVisitor<BFSNode>() {
+	private MoveCommand moveToFront(RegionState currentRegion, GameState state) {
+		class Node {
+			RegionState state;
+			Node previous;
 
-			@Override
-			public BFSVisitResult<BFSNode> visit(Region region, int level, BFSNode parent, BFSNode thisNode) {
-				//System.err.println((parent == null ? "START" : parent.level + ":" + parent.region) + " --> " + level + ":" + region);
-				if (!hasOnlyMyNeighbours(state.region(region), state)) {
-					moveToFrontRegion = region;
-					return new BFSVisitResult<BFSNode>(BFSVisitResultType.TERMINATE, thisNode == null ? new BFSNode() : thisNode);
-				}
-				return new BFSVisitResult<BFSNode>(thisNode == null ? new BFSNode() : thisNode);
+			Node(RegionState state) {
+				this.state = state;
 			}
-			
-		});
-		
-		if (moveToFrontRegion != null) {
-			//List<Region> path = fw.getPath(from.getRegion(), moveToFrontRegion);
-			List<Region> path = bfs.getAllPaths(moveToFrontRegion).get(0);
-			Region moveTo = path.get(1);
-			
-//			boolean first = true;
-//			for (Region region : path) {
-//				if (first) first = false;
-//				else System.err.print(" --> ");
-//				System.err.print(region);
-//			}
-//			System.err.println();
-			
-			return transfer(from, state.region(moveTo), state);
 		}
-		
+		List<Node> checked = new ArrayList<Node>();
+		List<RegionState> unchecked = new ArrayList<RegionState>();
+		checked.add(new Node(currentRegion));
+		for (RegionState r : state.regions) {
+			if (r != currentRegion)
+				unchecked.add(r);
+		}
+		int i = 0;
+		while (i < checked.size()) {
+			for (RegionState current : checked.get(i).state.neighbours) {
+				if (unchecked.contains(current)) {
+					Node curr = new Node(current);
+					checked.add(curr);
+					unchecked.remove(current);
+					curr.previous = checked.get(i);
+					if (!curr.state.owned(state.me)) {
+						while (curr.previous.state != currentRegion) {
+							curr = curr.previous;
+						}
+						
+						return transfer(currentRegion, state.region(curr.state.region), state);
+					}
+				}
+			}
+			i++;
+		}
 		return null;
 	}
 	

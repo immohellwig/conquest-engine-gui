@@ -3,7 +3,6 @@ package conquest.bot.warlight_hellwig;
 import java.util.ArrayList;
 import java.util.List;
 
-import conquest.bot.fight.FightSimulation.FightAttackersResults;
 import conquest.bot.state.Action;
 import conquest.bot.state.ChooseCommand;
 import conquest.bot.state.GameState;
@@ -71,7 +70,12 @@ public class WarlightGame implements Game<GameState, Action> {
 
 	@Override
 	public double outcome(GameState state) {
-		return state.winningPlayer();
+		switch (state.winningPlayer()) {
+		case 0: return 0.5;   // draw
+		case 1: return 1.0;
+		case 2: return 0.0;
+		default: throw new Error();
+		}
 	}
 
 	@Override
