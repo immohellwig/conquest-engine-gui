@@ -111,6 +111,8 @@ public class MCTSGenerator implements Generator<GameState, Action> {
 			List<Action> finalList = combinations(attackList, transferList);
 			if (finalList.isEmpty()) { // No Options? Random Move!
 				for (RegionState currentRegion : state.regions) {
+					if (currentRegion == null)
+						continue;
 					if (currentRegion.owned(state.me) && currentRegion.armies > 1) {
 						for (RegionState neighbor : currentRegion.neighbours) {
 							transferList.add(new MoveCommand(currentRegion, neighbor, currentRegion.armies - 1));
