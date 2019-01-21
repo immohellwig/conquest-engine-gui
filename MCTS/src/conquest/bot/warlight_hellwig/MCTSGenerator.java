@@ -105,9 +105,7 @@ public class MCTSGenerator implements Generator<GameState, Action> {
 						attackList.add(attackCommands);
 					} else if (!transferCommands.isEmpty()){
 						transferList.addAll(transferCommands);
-					} else {
-						System.out.println("No Candidates: Explore Random Move!");
-					}
+					} 
 				}
 			}
 			List<Action> finalList = combinations(attackList, transferList);
