@@ -17,7 +17,7 @@ import conquest.game.world.Region;
 import conquest.utils.Util;
 import mcts.Generator;
 
-public class MCTSGenerator implements Generator<GameState, Action> {
+public class WarlightGenerator implements Generator<GameState, Action> {
 
 	@Override
 	public List<Action> actions(GameState state) {

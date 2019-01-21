@@ -27,7 +27,7 @@ public class MCTSBot extends GameBot {
 	public ChooseCommand chooseRegion(List<Region> choosable, long timeout) {
 		if (mcts == null) {
 			WarlightGame game = new WarlightGame(state);
-			MCTSGenerator generator = new MCTSGenerator();
+			WarlightGenerator generator = new WarlightGenerator();
 			mcts = new Mcts<GameState, Action>(game,generator, new AggressiveBaseStrategy(), 1000, 5);
 		}		
 		return (ChooseCommand) mcts.action(state);

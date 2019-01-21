@@ -10,8 +10,8 @@ public class Runner {
 			
 			S s = game.initialState();
 			while (!game.isDone(s)) {
+				System.out.println("Player " + game.player(s) + " moves...");
 				A a = game.player(s) == 1 ? strat1.action(s) : strat2.action(s);
-				
 				game.apply(s, a);
 			}
 
