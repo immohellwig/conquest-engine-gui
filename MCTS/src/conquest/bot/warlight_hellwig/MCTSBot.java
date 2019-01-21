@@ -16,7 +16,6 @@ import conquest.engine.Config;
 import conquest.engine.GameResult;
 import conquest.engine.RunGame;
 import conquest.game.FightMode;
-import conquest.game.world.Continent;
 import conquest.game.world.Region;
 import mcts.Mcts;
 
