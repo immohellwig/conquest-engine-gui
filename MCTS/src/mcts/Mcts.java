@@ -24,7 +24,7 @@ public class Mcts<S, A> implements Strategy<S, A> {
 		int counter = 0;
 
 		long time = System.currentTimeMillis();
-		long endingTime = time + timeLimit * 1000;
+		long endingTime = time + timeLimit;
 		while (System.currentTimeMillis() < endingTime) {
 			expanded = searchTree.treePolicy();
 			if (expanded == null)
