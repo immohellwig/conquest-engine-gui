@@ -74,7 +74,7 @@ class MCTSNode<S, A> {
 		children.add(node);
 	}
 
-	MCTSNode<S, A> getBestRatedChild(double exlorationConstant, int me) { // TODO Implement
+	MCTSNode<S, A> getBestRatedChild(final double exlorationConstant, final int me) { // TODO Implement
 		// ExplorationConstant
 		Iterator<MCTSNode<S, A>> iter = children.iterator();
 		MCTSNode<S, A> bestRated;
@@ -85,21 +85,26 @@ class MCTSNode<S, A> {
 			return null;
 		}
 		MCTSNode<S, A> current;
-		double bestRating = bestRated.getExploRating(exlorationConstant, denominator);
-		double currentRating;
+//		double bestRating = bestRated.getExploRating(exlorationConstant, denominator);
+//		double currentRating;
 		while (iter.hasNext()) {
+//			current = iter.next();
+//			currentRating = current.getExploRating(exlorationConstant, denominator);
+//			if (bestRated.getPlayer() != me) {
+//				if (bestRating < currentRating) {
+//					bestRated = current;
+//					bestRating = bestRated.getExploRating(exlorationConstant, denominator);
+//				}
+//			} else {
+//				if (bestRating > currentRating) {
+//					bestRated = current;
+//					bestRating = bestRated.getExploRating(exlorationConstant, denominator);
+//				}
+//			}
 			current = iter.next();
-			currentRating = current.getExploRating(exlorationConstant, denominator);
-			if (bestRated.getPlayer() != me) {
-				if (bestRating < currentRating) {
-					bestRated = current;
-					bestRating = bestRated.getExploRating(exlorationConstant, denominator);
-				}
-			} else {
-				if (bestRating > currentRating) {
-					bestRated = current;
-					bestRating = bestRated.getExploRating(exlorationConstant, denominator);
-				}
+			if (bestRated.getExploRating(exlorationConstant, denominator) < current.getExploRating(exlorationConstant,
+					denominator)) {
+				bestRated = current;
 			}
 		}
 		return bestRated;
@@ -134,7 +139,7 @@ class MCTSNode<S, A> {
 		return father;
 	}
 
-	double getExploRating(double eC, double denominatorFather) {
+	double getExploRating(final double eC, final double denominatorFather) {
 		return (numerator / denominator) + eC * Math.sqrt((2 * Math.log(denominatorFather)) / denominator);
 	}
 
