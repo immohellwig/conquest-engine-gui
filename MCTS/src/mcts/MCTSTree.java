@@ -31,8 +31,7 @@ class MCTSTree<S, A> {
 			if (currentNode.isNotFullyExpanded()) {
 				return expand(currentNode);
 			} else {
-				boolean samePlayer = game.player(currentNode.getState()) == game.player(currentNode.getRandomChildState());
-				currentNode = currentNode.getBestRatedChild(expConst, samePlayer);
+				currentNode = currentNode.getBestRatedChild(expConst);
 			}
 		}
 		return currentNode;

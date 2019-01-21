@@ -80,8 +80,8 @@ class MCTSNode<S, A> {
 		}
 	}
 
-	MCTSNode<S, A> getBestRatedChild(double exlorationConstant, boolean samePlayer) { // TODO Implement
-																						// ExplorationConstant
+	MCTSNode<S, A> getBestRatedChild(double exlorationConstant) { // TODO Implement
+																	// ExplorationConstant
 		Iterator<MCTSNode<S, A>> iter = children.iterator();
 		MCTSNode<S, A> bestRated;
 		if (iter.hasNext()) {
@@ -93,16 +93,9 @@ class MCTSNode<S, A> {
 		MCTSNode<S, A> current;
 		while (iter.hasNext()) {
 			current = iter.next();
-			if (samePlayer) {
-				if (bestRated.getExploRating(exlorationConstant, denominator) > current
-						.getExploRating(exlorationConstant, denominator)) {
-					bestRated = current;
-				}
-			} else {
-				if (bestRated.getExploRating(exlorationConstant, denominator) < current
-						.getExploRating(exlorationConstant, denominator)) {
-					bestRated = current;
-				}
+			if (bestRated.getExploRating(exlorationConstant, denominator) < current.getExploRating(exlorationConstant,
+					denominator)) {
+				bestRated = current;
 			}
 		}
 		return bestRated;
