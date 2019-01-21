@@ -28,7 +28,7 @@ public class MCTSBot extends GameBot {
 		if (mcts == null) {
 			WarlightGame game = new WarlightGame(state);
 			MCTSGenerator generator = new MCTSGenerator();
-			mcts = new Mcts<GameState, Action>(game,generator, new AggressiveBaseStrategy(), 1000, 3);
+			mcts = new Mcts<GameState, Action>(game,generator, new AggressiveBaseStrategy(), 1000, 5);
 		}		
 		return (ChooseCommand) mcts.action(state);
 	}
@@ -51,7 +51,7 @@ public class MCTSBot extends GameBot {
 		config.bot2Init = "internal:conquest.bot.warlight_hellwig.RunVsAggressive";
 		// config.bot2Init = "human";
 
-		config.botCommandTimeoutMillis = 20 * 1000;
+		config.botCommandTimeoutMillis = 200000 * 1000;
 
 		config.game.maxGameRounds = 200;
 

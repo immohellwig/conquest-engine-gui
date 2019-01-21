@@ -3,8 +3,6 @@ package mcts;
 public class Mcts<S, A> implements Strategy<S, A> {
 	private int timeLimit;
 
-//	final private int determinizations; // TODO: Implement!
-
 	final private MCTSTree<S, A> searchTree;
 
 	final private Game<S, A> game;
@@ -13,7 +11,6 @@ public class Mcts<S, A> implements Strategy<S, A> {
 
 	public Mcts(Game<S, A> game, Generator<S, A> generator, Strategy<S, A> base, int determinizations, int timeLimit) {
 		this.timeLimit = timeLimit;
-//		this.determinizations = determinizations;
 		this.game = game;
 		this.base = base;
 		this.searchTree = new MCTSTree<S, A>(game, generator, game.initialState());

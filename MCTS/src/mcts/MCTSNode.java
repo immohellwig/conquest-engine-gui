@@ -87,7 +87,7 @@ class MCTSNode<S, A> {
 		if (iter.hasNext()) {
 			bestRated = iter.next();
 		} else {
-			System.err.println("Root has no Children!");
+			System.err.println("BestRated has no Children!");
 			return null;
 		}
 		MCTSNode<S, A> current;
@@ -130,12 +130,8 @@ class MCTSNode<S, A> {
 		return father;
 	}
 
-	double getRating() {
-		return numerator / denominator;
-	}
-
 	double getExploRating(double eC, double denominatorFather) {
-		return ((1 - numerator) / denominator) + eC * Math.sqrt((2 * Math.log(denominatorFather)) / denominator);
+		return (numerator / denominator) + eC * Math.sqrt((2 * Math.log(denominatorFather)) / denominator);
 	}
 
 	S getState() {
@@ -144,6 +140,10 @@ class MCTSNode<S, A> {
 
 	@Override
 	public String toString() {
-		return Double.toString(getExploRating(0, 0));
+		return Double.toString(getExploRating(0.0, father.getDenominator()));
+	}
+
+	double getDenominator() {
+		return denominator;
 	}
 }
