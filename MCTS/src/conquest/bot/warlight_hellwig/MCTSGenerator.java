@@ -103,8 +103,10 @@ public class MCTSGenerator implements Generator<GameState, Action> {
 					if (!attackCommands.isEmpty()) {
 						attackCommands.add(null);
 						attackList.add(attackCommands);
-					} else {
+					} else if (!transferCommands.isEmpty()){
 						transferList.addAll(transferCommands);
+					} else {
+						
 					}
 				}
 			}
@@ -118,8 +120,8 @@ public class MCTSGenerator implements Generator<GameState, Action> {
 							transferList.add(new MoveCommand(currentRegion, neighbor, currentRegion.armies - 1));
 							finalList.add(new MoveAction(transferList));
 						}
+						break;
 					}
-					break;
 				}
 			}
 			return finalList;
