@@ -106,7 +106,7 @@ public class MCTSGenerator implements Generator<GameState, Action> {
 					} else if (!transferCommands.isEmpty()){
 						transferList.addAll(transferCommands);
 					} else {
-						
+						System.out.println("No Candidates: Explore Random Move!");
 					}
 				}
 			}
@@ -119,6 +119,7 @@ public class MCTSGenerator implements Generator<GameState, Action> {
 						for (RegionState neighbor : currentRegion.neighbours) {
 							transferList.add(new MoveCommand(currentRegion, neighbor, currentRegion.armies - 1));
 							finalList.add(new MoveAction(transferList));
+							transferList.clear();
 						}
 						break;
 					}
