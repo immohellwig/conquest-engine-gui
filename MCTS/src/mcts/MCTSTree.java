@@ -17,15 +17,14 @@ class MCTSTree<S, A> {
 		return root;
 	}
 	
-	public boolean updateRoot(final S state) {
+	public void updateRoot(final S state) {
 		S init = state;
 		List<A> moveCandidates = generator.actions(init);
 		root = new MCTSNode<S, A>(init, moveCandidates);
-		return true;
 	}
 
 	public MCTSNode<S, A> treePolicy() {
-		MCTSNode<S, A> currentNode = getRoot();
+		MCTSNode<S, A> currentNode = root;
 		double expConst = 1 / Math.sqrt(2); // paper
 		while (!game.isDone(currentNode.getState())) {
 			if (currentNode.isNotFullyExpanded()) {
