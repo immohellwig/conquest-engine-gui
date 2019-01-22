@@ -29,7 +29,7 @@ class MCTSNode<S, A> {
 	 * Unexplored actions
 	 */
 
-	final private List<A> possilbleActions;
+	private List<A> possilbleActions;
 
 	/**
 	 * Move, that led to the current state
@@ -50,18 +50,20 @@ class MCTSNode<S, A> {
 	private double denominator = 0;
 
 	private final int player;
+	
+	private final Generator<S, A> generator; 
 
 	/**
 	 * Root constructor, initializes rating with 0
 	 */
 
-	MCTSNode(S state, List<A> possibleActions, int player) {
-		this(null, state, possibleActions, null, player);
+	MCTSNode(S state, Generator<S, A> gen, int player) {
+		this(null, state, gen, null, player);
 	}
 
-	MCTSNode(A lastAction, S state, List<A> possibleActions, MCTSNode<S, A> father, int player) {
+	MCTSNode(A lastAction, S state, Generator<S, A> gen, MCTSNode<S, A> father, int player) {
 		this.state = state;
-		this.possilbleActions = possibleActions;
+		this.generator = gen;
 		this.father = father;
 		this.children = new ArrayList<MCTSNode<S, A>>();
 		this.lastAction = lastAction;
@@ -85,8 +87,7 @@ class MCTSNode<S, A> {
 			return null;
 		}
 		MCTSNode<S, A> current;
-//		double bestRating = bestRated.getExploRating(exlorationConstant, denominator);
-//		double currentRating;
+
 		while (iter.hasNext()) {
 //			current = iter.next();
 //			currentRating = current.getExploRating(exlorationConstant, denominator);
@@ -128,6 +129,8 @@ class MCTSNode<S, A> {
 	}
 
 	boolean isNotFullyExpanded() {
+		if (possilbleActions == null)
+			possilbleActions = generator.actions(state);
 		return !possilbleActions.isEmpty();
 	}
 
@@ -138,9 +141,13 @@ class MCTSNode<S, A> {
 	MCTSNode<S, A> getFather() {
 		return father;
 	}
-
+	
 	double getExploRating(final double eC, final double denominatorFather) {
 		return (numerator / denominator) + eC * Math.sqrt((2 * Math.log(denominatorFather)) / denominator);
+	}
+	
+	private double getNegExploRating(double eC, double denominatorFather) {
+		return (numerator / denominator) - eC * Math.sqrt((2 * Math.log(denominatorFather)) / denominator);
 	}
 
 	S getState() {
@@ -149,7 +156,7 @@ class MCTSNode<S, A> {
 
 	@Override
 	public String toString() {
-		return Double.toString(getExploRating(0.0, father.getDenominator()));
+		return Double.toString(getExploRating(0.0, father.getDenominator())) + "\n" + state;
 	}
 
 	double getDenominator() {

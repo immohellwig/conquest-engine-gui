@@ -10,4 +10,10 @@ class TRandomStrategy implements Strategy<TState, Integer> {
 	public Integer action(TState s) {
 		return s.randomAction();
 	}
+
+//	@Override
+//	public void setTimeLimit(int i) {
+//		// TODO DEBUG
+//		
+//	}
 }
