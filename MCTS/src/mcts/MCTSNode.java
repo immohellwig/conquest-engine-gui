@@ -29,7 +29,7 @@ class MCTSNode<S, A> {
 	 * Unexplored actions
 	 */
 
-	final private List<A> possilbleActions;
+	private List<A> possilbleActions;
 
 	/**
 	 * Move, that led to the current state
@@ -50,18 +50,20 @@ class MCTSNode<S, A> {
 	private double denominator = 0;
 
 	private final int player;
+	
+	private final Generator<S, A> generator; 
 
 	/**
 	 * Root constructor, initializes rating with 0
 	 */
 
-	MCTSNode(S state, List<A> possibleActions, int player) {
-		this(null, state, possibleActions, null, player);
+	MCTSNode(S state, Generator<S, A> gen, int player) {
+		this(null, state, gen, null, player);
 	}
 
-	MCTSNode(A lastAction, S state, List<A> possibleActions, MCTSNode<S, A> father, int player) {
+	MCTSNode(A lastAction, S state, Generator<S, A> gen, MCTSNode<S, A> father, int player) {
 		this.state = state;
-		this.possilbleActions = possibleActions;
+		this.generator = gen;
 		this.father = father;
 		this.children = new ArrayList<MCTSNode<S, A>>();
 		this.lastAction = lastAction;
@@ -75,7 +77,6 @@ class MCTSNode<S, A> {
 	}
 
 	MCTSNode<S, A> getBestRatedChild(double exlorationConstant, int me) {
-		// ExplorationConstant
 		Iterator<MCTSNode<S, A>> iter = children.iterator();
 		MCTSNode<S, A> bestRated;
 		if (iter.hasNext()) {
@@ -125,6 +126,8 @@ class MCTSNode<S, A> {
 	}
 
 	boolean isNotFullyExpanded() {
+		if (possilbleActions == null)
+			possilbleActions = generator.actions(state);
 		return !possilbleActions.isEmpty();
 	}
 

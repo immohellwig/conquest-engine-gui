@@ -19,8 +19,7 @@ class MCTSTree<S, A> {
 	
 	public void updateRoot(final S state) {
 		S init = state;
-		List<A> moveCandidates = generator.actions(init);
-		root = new MCTSNode<S, A>(init, moveCandidates, game.player(state));
+		root = new MCTSNode<S, A>(init, generator, game.player(state));
 	}
 
 	public MCTSNode<S, A> treePolicy() {
@@ -39,7 +38,7 @@ class MCTSTree<S, A> {
 	private MCTSNode<S, A> expand(final MCTSNode<S, A> currentNode) {
 		A nextAction = currentNode.popRandomAction();
 		S newState = game.possibleResults(currentNode.getState(), nextAction).get(0).state;
-		MCTSNode<S, A> expanded = new MCTSNode<S, A>(nextAction, newState, generator.actions(newState), currentNode, game.player(newState));
+		MCTSNode<S, A> expanded = new MCTSNode<S, A>(nextAction, newState, generator, currentNode, game.player(newState));
 		return expanded;
 	}
 

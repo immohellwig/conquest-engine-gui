@@ -37,7 +37,7 @@ public class Mcts<S, A> implements Strategy<S, A> {
 			counter++;
 		}
 		try {
-			System.out.println("Speed: " + counter / (timeLimit / 1000) + " N/s");
+			System.out.println("Speed: " + counter / ((double) timeLimit / 1000) + " N/s");
 			A result = searchTree.getRoot().getBestRatedChild(0,game.player(state)).getAction();
 			return result;
 		} catch (Exception e) {
