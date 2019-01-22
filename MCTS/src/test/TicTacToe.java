@@ -21,9 +21,9 @@ public class TicTacToe implements Game<TState, Integer> {
     public static void main(String[] args) {
 		TicTacToe game = new TicTacToe();
 				
-		Strategy<TState, Integer> emm = new Mcts<TState, Integer>(game, new TGenerator(), new BasicStrategy(), 1000, 500); 
+		Strategy<TState, Integer> emm = new Mcts<TState, Integer>(game, new TGenerator(), new BasicStrategy(), 1000, 1000); 
 		
-		Runner.play(game, emm, new TRandomStrategy(), 500);
+		Runner.play(game, emm,new BasicStrategy(), 500);
 	}
 
 	@Override

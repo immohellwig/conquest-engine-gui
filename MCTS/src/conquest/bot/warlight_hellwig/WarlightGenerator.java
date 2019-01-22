@@ -78,8 +78,8 @@ public class WarlightGenerator implements Generator<GameState, Action> {
 
 					List<MoveCommand> attackCommands = new ArrayList<MoveCommand>();
 					List<MoveCommand> transferCommands = new ArrayList<MoveCommand>();
-					if (currentRegion.armies <= 3 || mayAttack.isEmpty()) {
-						enemyNeighbors = 0; // TODO Refactor
+					if (currentRegion.armies <= 3 || mayAttack.isEmpty()) { // No promising attack-targets?
+						enemyNeighbors = 0; 
 					}
 					if (enemyNeighbors > 1) {
 						if (regionHasOppNeighbor) {

@@ -77,9 +77,4 @@ public class WarlightGame implements Game<GameState, Action> {
 		default: throw new Error();
 		}
 	}
-
-	@Override
-	public Game<GameState, Action> clone() {
-		return new WarlightGame(gameState);
-	}
 }

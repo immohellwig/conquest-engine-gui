@@ -13,6 +13,6 @@ public class WarlightRunner {
 		GameState state = new GameState();
 		WarlightGame game = new WarlightGame(state);
 		WarlightGenerator generator = new WarlightGenerator();
-		Runner.play(game, new Mcts<GameState, Action>(game, generator, new AggressiveBaseStrategy(), 1000, 3000), new AggressiveBaseStrategy(), 100);
+		Runner.play(game, new AggressiveBaseStrategy(), new Mcts<GameState, Action>(game, generator, new AggressiveBaseStrategy(), 1000, 3000), 100);
 	}
 }

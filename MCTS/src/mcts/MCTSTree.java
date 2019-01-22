@@ -36,7 +36,7 @@ class MCTSTree<S, A> {
 		return currentNode != root ? currentNode : null;
 	}
 	
-	private MCTSNode<S, A> expand(final MCTSNode<S, A> currentNode) { // TODO: randomize?
+	private MCTSNode<S, A> expand(final MCTSNode<S, A> currentNode) {
 		A nextAction = currentNode.popRandomAction();
 		S newState = game.possibleResults(currentNode.getState(), nextAction).get(0).state;
 		MCTSNode<S, A> expanded = new MCTSNode<S, A>(nextAction, newState, generator.actions(newState), currentNode, game.player(newState));

@@ -15,7 +15,7 @@ public interface Game<S, A> {
 
 	double outcome(S state); // 1.0 = player 1 wins, 0.5 = draw, 0.0 = player 2 wins
 
-//	Game<S, A> clone();
+//	S clone(S s);
 
 //	double evaluate(S state); // expected outcome from this state (for expectiminimax only)
 }

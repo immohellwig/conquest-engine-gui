@@ -74,7 +74,7 @@ class MCTSNode<S, A> {
 		children.add(node);
 	}
 
-	MCTSNode<S, A> getBestRatedChild(double exlorationConstant, int me) { // TODO Implement
+	MCTSNode<S, A> getBestRatedChild(double exlorationConstant, int me) {
 		// ExplorationConstant
 		Iterator<MCTSNode<S, A>> iter = children.iterator();
 		MCTSNode<S, A> bestRated;
@@ -85,20 +85,22 @@ class MCTSNode<S, A> {
 			return null;
 		}
 		MCTSNode<S, A> current;
-		double bestRating = bestRated.getExploRating(exlorationConstant, denominator);
 		double currentRating;
+		double bestRating;
 		while (iter.hasNext()) {
 			current = iter.next();
-			currentRating = current.getExploRating(exlorationConstant, denominator);
 			if (bestRated.getPlayer() != me) {
+				bestRating = bestRated.getExploRating(exlorationConstant, denominator);
+				currentRating = current.getExploRating(exlorationConstant, denominator);
 				if (bestRating < currentRating) {
 					bestRated = current;
 					bestRating = bestRated.getExploRating(exlorationConstant, denominator);
 				}
 			} else {
+				currentRating = current.getNegExploRating(exlorationConstant, denominator);
+				bestRating = bestRated.getNegExploRating(exlorationConstant, denominator);
 				if (bestRating > currentRating) {
 					bestRated = current;
-					bestRating = bestRated.getExploRating(exlorationConstant, denominator);
 				}
 			}
 		}
@@ -134,8 +136,12 @@ class MCTSNode<S, A> {
 		return father;
 	}
 
-	double getExploRating(double eC, double denominatorFather) {
+	private double getExploRating(double eC, double denominatorFather) {
 		return (numerator / denominator) + eC * Math.sqrt((2 * Math.log(denominatorFather)) / denominator);
+	}
+	
+	private double getNegExploRating(double eC, double denominatorFather) {
+		return (numerator / denominator) - eC * Math.sqrt((2 * Math.log(denominatorFather)) / denominator);
 	}
 
 	S getState() {
@@ -144,7 +150,7 @@ class MCTSNode<S, A> {
 
 	@Override
 	public String toString() {
-		return Double.toString(getExploRating(0.0, father.getDenominator()));
+		return Double.toString(getExploRating(0.0, father.getDenominator())) + "\n" + state;
 	}
 
 	double getDenominator() {
